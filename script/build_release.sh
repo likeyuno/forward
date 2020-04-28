@@ -2,14 +2,16 @@
 
 project="forward"
 
-targets=(
-  "x86_64-unknown-linux-gnu"
+declare -A targets=(
+  ["linux_x86-64"]="x86_64-unknown-linux-gnu"
 )
 
-mkdir -p build
+mkdir -p release
 
-for target in "${targets[@]}"; do
+for platform in "${!targets[@]}"; do
+  target="${targets[$platform]}"
   rustup target add "$target"
   cargo build --target="$target" --release
-  cp target/"$target"/release/"$project" build/"$project"_"$target"
+  7z a ./release/"$project"_"$platform".7z ./target/"$target"/release/"$project" README.md LICENSE
+  sha1sum ./release/"$project"_"$platform".7z > ./release/"$project"_"$platform".7z.sha1
 done
